@@ -1,0 +1,40 @@
+version: "3"
+services:
+  wordpress:
+    depends_on:
+      - database
+
+  database:
+    image: mysql:8.0
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 2
+        delay: 5s
+        window: 120s
+    container_name: database
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - wpnet
+    env_file:
+      - mysql.env
+
+  wordpress:
+    image: wordpress
+    container_name: wp
+    networks:
+      - wpnet
+    volumes:
+      - wp-data:/var/www/html
+    env_file:
+      - wordpress.env
+    ports:
+      - "8080:80"
+
+networks:
+  wpnet:
+
+volumes:
+  mysql-data:
+  wp-data:
